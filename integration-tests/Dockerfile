@@ -1,9 +1,9 @@
 # Systemd inside a Docker container, for CI only
 FROM ubuntu:18.04
 
-RUN apt-get update --yes
-
-RUN apt-get install --yes systemd curl git sudo
+RUN sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list \
+    && apt-get update --yes \
+    && apt-get install --yes systemd curl git sudo openjdk-8-jdk vim zip
 
 # Kill all the things we don't need
 RUN find /etc/systemd/system \
@@ -14,9 +14,8 @@ RUN find /etc/systemd/system \
     -not -name '*systemd-user-sessions*' \
     -exec rm \{} \;
 
-RUN mkdir -p /etc/sudoers.d
-
-RUN systemctl set-default multi-user.target
+RUN mkdir -p /etc/sudoers.d \
+    && systemctl set-default multi-user.target
 
 STOPSIGNAL SIGRTMIN+3
 
